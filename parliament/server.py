@@ -26,9 +26,10 @@ def create(func):
     app = Flask(__name__)
     set_log_level(app, os.environ.get("LOG_LEVEL", "WARNING"))
 
-    @app.route("/", methods=["POST"])
+    @app.route("/<path>", methods=["POST"])
     def handle_post():
         context = Context(request)
+        app.logger.info(request.view_args['path'])
         try:
             context.cloud_event = from_http(CloudEvent, request.headers,
                                             request.get_data())
@@ -38,8 +39,9 @@ def create(func):
             app.logger.exception(traceback.print_exc())
         return invoke(func, context)
 
-    @app.route("/", methods=["GET"])
+    @app.route("/<path>", methods=["GET"])
     def handle_get():
+        app.logger.info(request.view_args['path'])
         context = Context(request)
         return invoke(func, context)
 
