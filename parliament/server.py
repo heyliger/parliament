@@ -26,8 +26,8 @@ def create(func):
     app = Flask(__name__)
     set_log_level(app, os.environ.get("LOG_LEVEL", "WARNING"))
 
-    @app.route("/data/<section>", methods=["POST"])
-    def handle_post():
+    @app.route("/<path>", methods=["POST"])
+    def handle_post(path):
         context = Context(request)
         app.logger.info(request.view_args['path'])
         try:
@@ -39,9 +39,9 @@ def create(func):
             app.logger.exception(traceback.print_exc())
         return invoke(func, context)
 
-    @app.route("/data/<section>", methods=["GET"])
-    def handle_get():
-        app.logger.info(request.view_args['section'])
+    @app.route("/<path>", methods=["GET"])
+    def handle_get(path):
+        app.logger.info(request.view_args['path'])
         context = Context(request)
         return invoke(func, context)
 
